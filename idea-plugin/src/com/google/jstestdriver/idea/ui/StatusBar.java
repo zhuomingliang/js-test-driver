@@ -24,8 +24,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.ResourceBundle;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 /**
  * @author alexeagle@google.com (Alex Eagle)
@@ -36,21 +35,20 @@ public class StatusBar extends JPanel implements Observer {
 
   public enum Status {
     NOT_RUNNING {
-
       @Override
       public Color getColor() {
         return Color.decode("#FF6666");
       }
     },
-    NO_BROWSERS {
 
+    NO_BROWSERS {
       @Override
       public Color getColor() {
         return Color.decode("#FFFF66");
       }
     },
-    READY {
 
+    READY {
       @Override
       public Color getColor() {
         return Color.decode("#66CC66");
@@ -76,22 +74,27 @@ public class StatusBar extends JPanel implements Observer {
     label.setText(messageBundle.getString(status.name()));
   }
 
-  public void update(Observable observable, Object event) {
-    if (observable instanceof JsTestDriverServer) {
-      switch ((JsTestDriverServer.Event) event) {
-        case STARTED:
-          setStatus(Status.NO_BROWSERS);
-          break;
-        case STOPPED:
-          setStatus(Status.NOT_RUNNING);
-          break;
+  public void update(final Observable observable, final Object event) {
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        if (observable instanceof JsTestDriverServer) {
+          switch ((JsTestDriverServer.Event) event) {
+            case STARTED:
+              setStatus(Status.NO_BROWSERS);
+              break;
+            case STOPPED:
+              setStatus(Status.NOT_RUNNING);
+              break;
+          }
+        } else if (observable instanceof CapturedBrowsers) {
+          if (((CapturedBrowsers)observable).getBrowsers().isEmpty()) {
+            setStatus(Status.NO_BROWSERS);
+          } else {
+            setStatus(Status.READY);
+          }
+        }
       }
-    } else if (observable instanceof CapturedBrowsers) {
-      if (((CapturedBrowsers)observable).getBrowsers().isEmpty()) {
-        setStatus(Status.NO_BROWSERS);
-      } else {
-        setStatus(Status.READY);
-      }
-    }
+    });
   }
 }
