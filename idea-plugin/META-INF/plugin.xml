@@ -17,14 +17,13 @@
 <idea-plugin>
   <name>JSTestDriver Plugin</name>
   <description>Execute JavaScript unit tests using JSTestDriver</description>
-  <version>1.2</version>
+  <version>1.2.2</version>
   <vendor url="http://code.google.com/p/js-test-driver/"
           email="js-test-driver@googlegroups.com">Google</vendor>
-  <idea-version since-build="9886"/>
+  <idea-version since-build="93.13"/> <!-- see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges -->
   <depends>com.intellij.modules.lang</depends>
   <extensions defaultExtensionNs="com.intellij">
     <configurationType implementation="com.google.jstestdriver.idea.JSTestDriverConfigurationType"/>
-    <!--configurationProducer implementation="com.google.jstestdriver.idea.JSTestDriverConfigurationProducer"/-->
   </extensions>
   <project-components>
     <component>
@@ -33,6 +32,10 @@
   </project-components>
   <change-notes>
     <![CDATA[
+Version 1.2.2:
+- Support IDEA 9, and other tools such as RubyMine and PHPStorm which share the intellij platform.
+- Thanks to Dariusz Kordonski for the patch that made this possible.
+
 Version 1.2:
 - Enable plugins when running tests, such as the coverage plugin
 - Bug fix: when browser disconnects, icon goes grey. When all browsers

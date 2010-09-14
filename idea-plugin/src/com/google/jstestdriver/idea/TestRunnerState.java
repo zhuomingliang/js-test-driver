@@ -129,7 +129,6 @@ public class TestRunnerState extends JavaCommandLineState {
     final SMTRunnerConsoleView consoleView;
     final ProcessHandler processHandler;
 
-
     public ProcessData(SMTRunnerConsoleView consoleView, ProcessHandler processHandler) {
       this.consoleView = consoleView;
       this.processHandler = processHandler;
