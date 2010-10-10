@@ -20,7 +20,10 @@
   <version>1.2.2</version>
   <vendor url="http://code.google.com/p/js-test-driver/"
           email="js-test-driver@googlegroups.com">Google</vendor>
-  <idea-version since-build="93.13"/> <!-- see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges -->
+  <idea-version since-build="IC-93.13" until-build="IC-95.9999"/>
+  <!-- see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges -->
+  <!-- and http://devnet.jetbrains.net/message/5273317 -->
+  <depends>com.intellij.modules.java</depends>
   <depends>com.intellij.modules.lang</depends>
   <extensions defaultExtensionNs="com.intellij">
     <configurationType implementation="com.google.jstestdriver.idea.JSTestDriverConfigurationType"/>
@@ -33,8 +36,9 @@
   <change-notes>
     <![CDATA[
 Version 1.2.2:
-- Support IDEA 9, and other tools such as RubyMine and PHPStorm which share the intellij platform.
+- Support IDEA 9.
 - Thanks to Dariusz Kordonski for the patch that made this possible.
+- Support for RubyMine, PhpStorm, WebStorm, etc is waiting on a new release from IntelliJ.
 
 Version 1.2:
 - Enable plugins when running tests, such as the coverage plugin
