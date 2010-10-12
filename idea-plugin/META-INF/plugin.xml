@@ -20,7 +20,7 @@
   <version>1.2.2</version>
   <vendor url="http://code.google.com/p/js-test-driver/"
           email="js-test-driver@googlegroups.com">Google</vendor>
-  <idea-version since-build="IC-96.1224" until-build="IC-97.9999"/>
+  <idea-version since-build="IC-96.1224" until-build="IC-98.9999"/>
   <!-- see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges -->
   <!-- and http://devnet.jetbrains.net/message/5273317 -->
   <depends>com.intellij.modules.lang</depends>
@@ -35,7 +35,7 @@
   <change-notes>
     <![CDATA[
 Version 1.2.2a:
-- Support WebStorm, PhpStorm, RubyMine, and PyCharm. Requires "Early Access Program" version of the IDE.
+- Support WebStorm, PhpStorm, RubyMine, and PyCharm. Thanks to Alexey Gopachenko for the patch!
 
 Version 1.2.2:
 - Support IDEA 9.

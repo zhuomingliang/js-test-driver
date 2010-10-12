@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" readonly="true" id="2725d72a-e9c0-4f7c-a6e3-c2ad304bb1b2" name="Default" comment="Update the plugin XML in preparation for a plugin release.&#10;&#10;Fixed the dependency on PeerFactory class, which isn't available in RubyMine, PhpStorm, and WebStorm, so the plugin loads, you can start the JSTD server, and create the run configuration. However, the run config cannot be executed; the button is greyed out.&#10;&#10;See http://devnet.jetbrains.net/message/5272353 where I just asked about this.">
+    <list default="true" readonly="true" id="2725d72a-e9c0-4f7c-a6e3-c2ad304bb1b2" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.xml" afterPath="$PROJECT_DIR$/build.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/jstestdriver/idea/JSTestDriverConfiguration.java" afterPath="$PROJECT_DIR$/src/com/google/jstestdriver/idea/JSTestDriverConfiguration.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/jstestdriver-plugin.ipr" afterPath="$PROJECT_DIR$/jstestdriver-plugin.ipr" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/jstestdriver-plugin.iml" afterPath="$PROJECT_DIR$/jstestdriver-plugin.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/jstestdriver/idea/TestRunnerState.java" afterPath="$PROJECT_DIR$/src/com/google/jstestdriver/idea/TestRunnerState.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/META-INF/plugin.xml" afterPath="$PROJECT_DIR$/META-INF/plugin.xml" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/com.intellij" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="../JsTestDriver/src-generated/" />
@@ -30,6 +26,21 @@
     <disable_hints />
   </component>
   <component name="DebuggerManager">
+    <line_breakpoints>
+      <breakpoint url="file://$PROJECT_DIR$/src/com/google/jstestdriver/idea/TestRunnerState.java" line="90" class="com.google.jstestdriver.idea.TestRunnerState" package="com.google.jstestdriver.idea">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+    </line_breakpoints>
     <breakpoint_any>
       <breakpoint>
         <option name="NOTIFY_CAUGHT" value="true" />
@@ -74,7 +85,7 @@
       <file leaf-file-name="TestRunnerState.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/com/google/jstestdriver/idea/TestRunnerState.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="84" column="7" selection-start="3859" selection-end="3859" vertical-scroll-proportion="1.0121787">
+            <state line="122" column="3" selection-start="5647" selection-end="5647" vertical-scroll-proportion="0.9674267">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -82,10 +93,19 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="DefaultProgramRunner.class" pinned="false" current="false" current-in-tab="false">
+        <entry file="jar:///Applications/PhpStorm-96.1224.app/lib/webide.jar!/com/intellij/execution/runners/DefaultProgramRunner.class">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="9" column="59" selection-start="388" selection-end="388" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="plugin.xml" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/META-INF/plugin.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="37" column="52" selection-start="1659" selection-end="1659" vertical-scroll-proportion="0.0">
+            <state line="38" column="0" selection-start="1703" selection-end="1703" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -94,7 +114,7 @@
       <file leaf-file-name="build.xml" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/build.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="23" column="84" selection-start="1427" selection-end="1427" vertical-scroll-proportion="0.0">
+            <state line="24" column="43" selection-start="1285" selection-end="1285" vertical-scroll-proportion="-12.4">
               <folding />
             </state>
           </provider>
@@ -104,6 +124,33 @@
         <entry file="file://$PROJECT_DIR$/src/com/google/jstestdriver/idea/JSTestDriverToolWindow.java">
           <provider selected="true" editor-type-id="text-editor">
             <state line="66" column="20" selection-start="1984" selection-end="1984" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="JSTestDriverConfigurationType.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/google/jstestdriver/idea/JSTestDriverConfigurationType.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="53" column="37" selection-start="1866" selection-end="1866" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="JSTestDriverConfiguration.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/google/jstestdriver/idea/JSTestDriverConfiguration.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="56" column="9" selection-start="2246" selection-end="2246" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PluginResources.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/google/jstestdriver/idea/PluginResources.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="35" column="13" selection-start="1153" selection-end="1153" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -142,16 +189,16 @@
     <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/../../js-test-driver/JsTestDriver/src/com/google/jstestdriver/model/RunDataFactory.java" />
-        <option value="$PROJECT_DIR$/build.xml" />
         <option value="$PROJECT_DIR$/../JsTestDriver/src/com/google/jstestdriver/TestErrors.java" />
         <option value="$PROJECT_DIR$/src/com/google/jstestdriver/idea/TestListenerContext.java" />
         <option value="$PROJECT_DIR$/src/com/google/jstestdriver/idea/RemoteTestListener.java" />
         <option value="$PROJECT_DIR$/src/com/google/jstestdriver/idea/ui/CapturedBrowsersPanel.java" />
         <option value="$PROJECT_DIR$/src/com/google/jstestdriver/idea/ui/StatusBar.java" />
         <option value="$PROJECT_DIR$/src/com/google/jstestdriver/idea/JSTestDriverToolWindow.java" />
-        <option value="$PROJECT_DIR$/META-INF/plugin.xml" />
         <option value="$PROJECT_DIR$/.idea/workspace.xml" />
         <option value="$PROJECT_DIR$/src/com/google/jstestdriver/idea/TestRunnerState.java" />
+        <option value="$PROJECT_DIR$/META-INF/plugin.xml" />
+        <option value="$PROJECT_DIR$/build.xml" />
       </list>
     </option>
   </component>
@@ -215,6 +262,38 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="idea-plugin" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="idea-plugin" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="idea-plugin" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="idea" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="idea-plugin" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="idea-plugin" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lib" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -366,24 +445,41 @@
       <module name="idea-plugin" />
       <option name="VM_PARAMETERS" value="-XX:MaxPermSize=120m -Didea.platform.prefix=PhpStorm" />
       <option name="PROGRAM_PARAMETERS" value="" />
-      <log_file path="$PROJECT_DIR$/../../../Library/Caches/IntelliJIdea90CE/plugins-sandbox/system/log/idea.log" checked="false" skipped="true" show_all="false" alias="IDEA LOG" />
+      <log_file path="$PROJECT_DIR$/../../../Library/Caches/IntelliJIdea90CE/rubymine-plugins-sandbox/system/log/idea.log" checked="false" skipped="true" show_all="false" alias="IDEA LOG" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="49962" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Debug" />
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
     <configuration default="false" name="webstorm-plugin" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
       <module name="idea-plugin" />
-      <option name="VM_PARAMETERS" value="-XX:MaxPermSize=120m" />
-      <option name="PROGRAM_PARAMETERS" value="-Didea.platform.prefix=WebIDE" />
+      <option name="VM_PARAMETERS" value="-XX:MaxPermSize=120m -Didea.platform.prefix=WebStorm" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <log_file path="$PROJECT_DIR$/../../../Library/Caches/IntelliJIdea90CE/plugins-sandbox/system/log/idea.log" checked="true" skipped="true" show_all="false" alias="IDEA LOG" />
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
-    <list size="4">
+    <configuration default="false" name="rubymine-plugin" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
+      <module name="idea-plugin" />
+      <option name="VM_PARAMETERS" value="-XX:MaxPermSize=120m -Didea.platform.prefix=RubyMine" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <log_file path="$PROJECT_DIR$/../../../Library/Caches/IntelliJIdea90CE/rubymine-plugins-sandbox/system/log/idea.log" checked="false" skipped="true" show_all="false" alias="IDEA LOG" />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <list size="5">
       <item index="0" class="java.lang.String" itemvalue="JSTestDriver.jstd1" />
       <item index="1" class="java.lang.String" itemvalue="Plugin.idea-plugin" />
       <item index="2" class="java.lang.String" itemvalue="Plugin.phpstorm-plugin" />
       <item index="3" class="java.lang.String" itemvalue="Plugin.webstorm-plugin" />
+      <item index="4" class="java.lang.String" itemvalue="Plugin.rubymine-plugin" />
     </list>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
       <Host>localhost</Host>
@@ -432,25 +528,25 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="22" width="1920" height="1174" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3501529" sideWeight="0.99864775" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.35009488" sideWeight="0.99864775" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3285528" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="JSTestDriver Server" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32721713" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39957717" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39943075" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32769555" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.12185997" sideWeight="0.7428843" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.12185997" sideWeight="0.64326376" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2504744" sideWeight="0.9679534" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2504744" sideWeight="0.9679534" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3285528" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
@@ -468,7 +564,7 @@
     <option name="ENABLE_BACKGROUND_PROCESSES" value="false" />
     <option name="CHANGED_ON_SERVER_INTERVAL" value="60" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updates to IDEA changelog and dependencies, to be sure we don't show as compatible in other &quot;platform&quot; IDEs yet." />
+    <option name="LAST_COMMIT_MESSAGE" value="Apply patch from JetBrains engineer Alexey Gopachenko, removing our dependency on the com.intellij.modules.java module. Also fix the way the command line is assembled to launch the test runner. Now the plugin works with PhpStorm.&#10;&#10;Next up: test with other &quot;platform&quot; IDE's and cut another release. The versions in the plugin.xml should ensure that the new version is only compatible with version 10 of the platform, which is in Early Access right now." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -484,6 +580,7 @@
     <MESSAGE value="Fix a couple spots where UI methods were called on a thread other than the AWT event dispatcher.&#10;&#10;In both cases, the calling thread was the JSTestDriver server, via an Observer." />
     <MESSAGE value="Update the plugin XML in preparation for a plugin release.&#10;&#10;Fixed the dependency on PeerFactory class, which isn't available in RubyMine, PhpStorm, and WebStorm, so the plugin loads, you can start the JSTD server, and create the run configuration. However, the run config cannot be executed; the button is greyed out.&#10;&#10;See http://devnet.jetbrains.net/message/5272353 where I just asked about this." />
     <MESSAGE value="Updates to IDEA changelog and dependencies, to be sure we don't show as compatible in other &quot;platform&quot; IDEs yet." />
+    <MESSAGE value="Apply patch from JetBrains engineer Alexey Gopachenko, removing our dependency on the com.intellij.modules.java module. Also fix the way the command line is assembled to launch the test runner. Now the plugin works with PhpStorm.&#10;&#10;Next up: test with other &quot;platform&quot; IDE's and cut another release. The versions in the plugin.xml should ensure that the new version is only compatible with version 10 of the platform, which is in Early Access right now." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -493,29 +590,9 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$APPLICATION_HOME_DIR$/lib/openapi.jar!/com/intellij/ui/content/ContentManager.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="7" selection-start="316" selection-end="316" vertical-scroll-proportion="0.3939394" />
-      </provider>
-    </entry>
-    <entry file="jar://$APPLICATION_HOME_DIR$/lib/openapi.jar!/com/intellij/ui/content/Content.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="5" column="24" selection-start="172" selection-end="172" vertical-scroll-proportion="0.25655976" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/google/jstestdriver/idea/JSTestDriverConfiguration.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="67" column="15" selection-start="2747" selection-end="2747" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
     <entry file="jar://$APPLICATION_HOME_DIR$/lib/openapi.jar!/com/intellij/execution/configurations/RunProfileState.class">
       <provider selected="true" editor-type-id="text-editor">
         <state line="5" column="6" selection-start="168" selection-end="168" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/google/jstestdriver/idea/JSTestDriverConfigurationType.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="13" selection-start="1158" selection-end="1158" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="jar:///Applications/PhpStorm-96.1224.app/lib/openapi.jar!/com/intellij/openapi/application/ApplicationNamesInfo.class">
@@ -538,26 +615,6 @@
         <state line="47" column="9" selection-start="1757" selection-end="1757" vertical-scroll-proportion="0.73767257" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/build.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="84" selection-start="1427" selection-end="1427" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/google/jstestdriver/idea/JSTestDriverToolWindow.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="66" column="20" selection-start="1984" selection-end="1984" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/google/jstestdriver/idea/TestListenerContext.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="0" selection-start="716" selection-end="716" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/google/jstestdriver/idea/TestRunner.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="37" column="13" selection-start="1202" selection-end="1202" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state line="2" column="0" selection-start="61" selection-end="61" vertical-scroll-proportion="0.06214689">
@@ -567,14 +624,64 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/META-INF/plugin.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="37" column="52" selection-start="1659" selection-end="1659" vertical-scroll-proportion="0.0">
+        <state line="38" column="0" selection-start="1703" selection-end="1703" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="43" selection-start="1285" selection-end="1285" vertical-scroll-proportion="-12.4">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/google/jstestdriver/idea/TestRunner.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="37" column="13" selection-start="1202" selection-end="1202" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/google/jstestdriver/idea/JSTestDriverToolWindow.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="66" column="20" selection-start="1984" selection-end="1984" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/google/jstestdriver/idea/JSTestDriverConfigurationType.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="53" column="37" selection-start="1866" selection-end="1866" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/google/jstestdriver/idea/JSTestDriverConfiguration.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="56" column="9" selection-start="2246" selection-end="2246" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/google/jstestdriver/idea/PluginResources.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="35" column="13" selection-start="1153" selection-end="1153" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/google/jstestdriver/idea/TestListenerContext.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="21" column="0" selection-start="716" selection-end="716" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="jar:///Applications/PhpStorm-96.1224.app/lib/webide.jar!/com/intellij/execution/runners/DefaultProgramRunner.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="59" selection-start="388" selection-end="388" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/google/jstestdriver/idea/TestRunnerState.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="84" column="7" selection-start="3859" selection-end="3859" vertical-scroll-proportion="1.0121787">
+        <state line="122" column="3" selection-start="5647" selection-end="5647" vertical-scroll-proportion="0.9674267">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
