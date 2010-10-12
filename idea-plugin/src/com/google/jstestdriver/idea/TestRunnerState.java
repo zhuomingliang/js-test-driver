@@ -21,9 +21,9 @@ import com.intellij.execution.DefaultExecutionResult;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.ExecutionResult;
 import com.intellij.execution.Executor;
-import com.intellij.execution.configurations.JavaCommandLineState;
-import com.intellij.execution.configurations.JavaParameters;
-import com.intellij.execution.configurations.RunConfigurationModule;
+import com.intellij.execution.configurations.CommandLineState;
+import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.process.ProcessListener;
@@ -33,69 +33,61 @@ import com.intellij.execution.testframework.TestConsoleProperties;
 import com.intellij.execution.testframework.sm.SMTestRunnerConnectionUtil;
 import com.intellij.execution.testframework.sm.runner.SMTRunnerConsoleProperties;
 import com.intellij.execution.testframework.sm.runner.ui.SMTRunnerConsoleView;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.projectRoots.Sdk;
-import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.Key;
-import com.intellij.util.PathUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.concurrent.*;
 
+import static com.intellij.util.PathUtil.getJarPathForClass;
+import static java.io.File.pathSeparator;
+
 /**
  * Encapsulates the execution state of the test runner.
  *
  * @author alexeagle@google.com (Alex Eagle)
  */
-public class TestRunnerState extends JavaCommandLineState {
+public class TestRunnerState extends CommandLineState {
 
   private final JSTestDriverConfiguration jsTestDriverConfiguration;
   protected final Project project;
-  private final RunConfigurationModule configurationModule;
   private final ExecutorService attachExecutor = Executors.newSingleThreadExecutor();
 
   // TODO(alexeagle): needs to be configurable?
   private static final int testResultPort = 10998;
 
   public TestRunnerState(JSTestDriverConfiguration jsTestDriverConfiguration, Project project,
-                         ExecutionEnvironment env, RunConfigurationModule configurationModule) {
+                         ExecutionEnvironment env) {
     super(env);
     this.jsTestDriverConfiguration = jsTestDriverConfiguration;
     this.project = project;
-    this.configurationModule = configurationModule;
   }
 
-  protected JavaParameters createJavaParameters() throws ExecutionException {
-    JavaParameters javaParameters = new JavaParameters();
-    Module module = configurationModule.getModule();
-    Sdk jdk = module == null ?
-            ProjectRootManager.getInstance(project).getProjectJdk() :
-            ModuleRootManager.getInstance(module).getSdk();
-    javaParameters.setJdk(jdk);
-    javaParameters.setMainClass(TestRunner.class.getName());
-    javaParameters.getClassPath().add(PathUtil.getJarPathForClass(JsTestDriverServer.class));
-    javaParameters.getClassPath().add(PathUtil.getJarPathForClass(TestRunner.class));
-    String serverURL = (jsTestDriverConfiguration.getServerType() == ServerType.INTERNAL ?
-            "http://localhost:" + ToolPanel.serverPort :
-            jsTestDriverConfiguration.getServerAddress());
-    javaParameters.getProgramParametersList().add(serverURL);
-    File configFile = new File(jsTestDriverConfiguration.getSettingsFile());
-    javaParameters.setWorkingDirectory(configFile.getParentFile());
-    javaParameters.getProgramParametersList().add(jsTestDriverConfiguration.getSettingsFile());
-    javaParameters.getProgramParametersList().add(String.valueOf(testResultPort));
-    // uncomment this thing if you want to debug jsTestDriver code in the test-runner process
-//    javaParameters.getVMParametersList().add("-Xdebug");
-//    javaParameters.getVMParametersList().add("-Xrunjdwp:transport=dt_socket,address=5000,server=y");
-    return javaParameters;
+  protected GeneralCommandLine createGeneralCommandLine() throws ExecutionException {
+    final String serverURL = (jsTestDriverConfiguration.getServerType() == ServerType.INTERNAL ?
+        "http://localhost:" + ToolPanel.serverPort :
+        jsTestDriverConfiguration.getServerAddress());
+    final File configFile = new File(jsTestDriverConfiguration.getSettingsFile());
+    return new GeneralCommandLine() {{
+      setWorkingDirectory(configFile.getParentFile());
+      setExePath(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
+      addParameter("-cp");
+      addParameter(getJarPathForClass(JsTestDriverServer.class) + pathSeparator + getJarPathForClass(TestRunner.class));
+      addParameter(TestRunner.class.getName());
+      addParameter(serverURL);
+      addParameter(jsTestDriverConfiguration.getSettingsFile());
+      addParameter(String.valueOf(testResultPort));
+      // uncomment this thing if you want to debug jsTestDriver code in the test-runner process
+      // addParameter("-Xdebug");
+      // addParameter("-Xrunjdwp:transport=dt_socket,address=5000,server=y");
+    }};
   }
 
   @Nullable
-  public ExecutionResult execute(Executor executor, @NotNull ProgramRunner runner) throws ExecutionException {
-    TestConsoleProperties testConsoleProperties = new SMTRunnerConsoleProperties(jsTestDriverConfiguration, "jsTestDriver");
+  public ExecutionResult execute(@NotNull Executor executor, @NotNull ProgramRunner runner) throws ExecutionException {
+    TestConsoleProperties testConsoleProperties = new SMTRunnerConsoleProperties(jsTestDriverConfiguration, "jsTestDriver", executor);
     TestListenerContext ctx = startAndAttach(testConsoleProperties);
     final RemoteTestListener listener = new RemoteTestListener(ctx);
     listener.listen(testResultPort);
@@ -110,6 +102,11 @@ public class TestRunnerState extends JavaCommandLineState {
       public void onTextAvailable(ProcessEvent event, Key outputType) {}
     });
     return new DefaultExecutionResult(ctx.consoleView(), ctx.processHandler(), createActions(ctx.consoleView(), ctx.processHandler()));
+  }
+
+  @Override
+  protected ProcessHandler startProcess() throws ExecutionException {
+    return new OSProcessHandler(createGeneralCommandLine().createProcess(), "");
   }
 
   private TestListenerContext startAndAttach(final TestConsoleProperties tcp) throws ExecutionException {
