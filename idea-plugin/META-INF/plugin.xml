@@ -20,7 +20,7 @@
   <version>1.2.2a</version>
   <vendor url="http://code.google.com/p/js-test-driver/"
           email="js-test-driver@googlegroups.com">Google</vendor>
-  <idea-version since-build="96.1224" until-build="98.9999"/>
+  <idea-version since-build="96.1224" until-build="100.9999"/>
   <!-- see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges -->
   <!-- and http://devnet.jetbrains.net/message/5273317 -->
   <depends>com.intellij.modules.lang</depends>
