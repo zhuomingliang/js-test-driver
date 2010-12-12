@@ -19,18 +19,22 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
 import com.google.jstestdriver.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.io.FileReader;
-import java.net.InetAddress;
+import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.net.InetAddress.getLocalHost;
+
 /**
- * Run JSTD in its own process, and stream messages to a server that lives in the IDEA process,
+ * Run JSTD in its own process, and stream messages via a socket to a server that lives in the IDEA process,
  * which will update the UI with our results.
  *
  * @author alexeagle@google.com (Alex Eagle)
@@ -51,7 +55,7 @@ public class TestRunner {
     this.out = out;
   }
 
-  public void execute() {
+  public void execute() throws InterruptedException {
     ResponseStreamFactory responseStreamFactory = createResponseStreamFactory();
     final ActionRunner dryRunRunner =
         makeActionBuilder(responseStreamFactory)
@@ -151,24 +155,38 @@ public class TestRunner {
     return parser.getPlugins();
   }
 
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args) throws Exception {
     String serverURL = args[0];
     String settingsFile = args[1];
     int port = Integer.parseInt(args[2]);
+    try {
+      Socket socket = connectToServer(port);
+      ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+      new TestRunner(serverURL, settingsFile, new File(""), outputStream).execute();
+    } catch (RuntimeException ex) {
+      if (ex.getCause() != null && ex.getCause() instanceof ConnectException) {
+        System.err.println("\nCould not connect to a JSTD server running at " + serverURL + "\n" +
+            "Check that the server is running.");
+      } else {
+        System.err.println("JSTestDriver crashed!");
+        throw ex;
+      }
+    }
+  }
+
+  private static Socket connectToServer(int port) throws IOException {
     int retries = RETRIES;
     Socket socket = null;
     do {
       try {
         socket = new Socket();
-        socket.connect(new InetSocketAddress(InetAddress.getLocalHost(), port), TIMEOUT_MILLIS);
+        socket.connect(new InetSocketAddress(getLocalHost(), port), TIMEOUT_MILLIS);
         break;
       } catch (SocketException e) {
         retries--;
       }
     } while (retries > 0);
-
-    new TestRunner(serverURL, settingsFile, new File(""),
-        new ObjectOutputStream(socket.getOutputStream())).execute();
+    return socket;
   }
 
 }
