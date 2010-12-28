@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/idea-plugin.iml" filepath="$PROJECT_DIR$/idea-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../JsTestDriver/jstestdriver.iml" filepath="$PROJECT_DIR$/../JsTestDriver/jstestdriver.iml" />
     </modules>
   </component>
 </project>

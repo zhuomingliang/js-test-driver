@@ -15,7 +15,10 @@
  */
 package com.google.jstestdriver.idea;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Sets;
+import com.google.inject.Module;
 import com.google.jstestdriver.JsTestDriverServer;
 import com.google.jstestdriver.idea.ui.ToolPanel;
 import com.intellij.execution.DefaultExecutionResult;
@@ -32,16 +35,21 @@ import com.intellij.execution.testframework.TestConsoleProperties;
 import com.intellij.execution.testframework.sm.runner.SMTRunnerConsoleProperties;
 import com.intellij.execution.testframework.sm.runner.ui.SMTRunnerConsoleView;
 import com.intellij.execution.testframework.ui.BaseTestsOutputConsoleView;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.Set;
 import java.util.concurrent.*;
 
+import static com.google.common.collect.Lists.transform;
 import static com.intellij.execution.testframework.sm.SMTestRunnerConnectionUtil.attachRunner;
 import static com.intellij.util.PathUtil.getJarPathForClass;
 import static java.io.File.pathSeparator;
+import static java.io.File.separatorChar;
+import static java.util.Arrays.asList;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
 /**
@@ -54,13 +62,22 @@ public class TestRunnerState extends CommandLineState {
 
   private final JSTestDriverConfiguration jsTestDriverConfiguration;
   protected final Project project;
-  private final ExecutorService attachExecutor =
-      newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("testProcessLauncher-%d").build());
+  private final ExecutorService attachExecutor = newSingleThreadExecutor(namedThreadFactory("testProcessLauncher"));
   private final ExecutorService testResultReceiverExecutor =
-      newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("remoteTestResultReceiver-%d").build());
+      newSingleThreadExecutor(namedThreadFactory("remoteTestResultReceiver-%d"));
 
+  private final Logger logger = Logger.getInstance(TestRunnerState.class.getCanonicalName());
   // TODO(alexeagle): needs to be configurable?
   private static final int testResultPort = 10998;
+
+  private ThreadFactory namedThreadFactory(final String threadName) {
+    return new ThreadFactory() {
+      @Override public Thread newThread(Runnable r) {
+        Thread thread = Executors.defaultThreadFactory().newThread(r);
+        thread.setName(threadName);
+        return thread;
+      }};
+  }
 
   public TestRunnerState(JSTestDriverConfiguration jsTestDriverConfiguration, Project project,
                          ExecutionEnvironment env) {
@@ -80,14 +97,41 @@ public class TestRunnerState extends CommandLineState {
       // uncomment this if you want to debug jsTestDriver code in the test-runner process
       //addParameter("-Xdebug");
       //addParameter("-Xrunjdwp:transport=dt_socket,address=5000,server=y,suspend=y");
-      
+
       addParameter("-cp");
-      addParameter(getJarPathForClass(JsTestDriverServer.class) + pathSeparator + getJarPathForClass(TestRunner.class));
+      addParameter(buildClasspath());
+
       addParameter(TestRunner.class.getName());
       addParameter(serverURL);
       addParameter(jsTestDriverConfiguration.getSettingsFile());
       addParameter(String.valueOf(testResultPort));
     }};
+  }
+
+  private static final Function<File, String> getAbsolutePath = new Function<File, String>() {
+    @Override public String apply(File file) {
+      return file.getAbsolutePath();
+    }};
+
+  private String buildClasspath() {
+    Set<String> classpath = Sets.newHashSet();
+
+    String pathToJstd = getJarPathForClass(JsTestDriverServer.class);
+    boolean isRunningInIde = !pathToJstd.endsWith(".jar");
+    if (isRunningInIde) {
+      // JSTD compiled code is in a classes/ folder
+      classpath.add(pathToJstd);
+      String pathToLibJar = getJarPathForClass(Module.class);
+      File[] libs = new File(pathToLibJar.substring(0, pathToLibJar.lastIndexOf(separatorChar))).listFiles();
+
+      classpath.addAll(transform(asList(libs), getAbsolutePath));
+    } else {
+      // JSTD is in a jar next to other libraries
+      File[] libs = new File(pathToJstd.substring(0, pathToJstd.lastIndexOf(separatorChar))).listFiles();
+      classpath.addAll(transform(asList(libs), getAbsolutePath));
+    }
+    
+    return Joiner.on(pathSeparator).join(classpath);
   }
 
   @Nullable
@@ -115,7 +159,9 @@ public class TestRunnerState extends CommandLineState {
 
   @Override
   protected ProcessHandler startProcess() throws ExecutionException {
-    return new OSProcessHandler(createGeneralCommandLine().createProcess(), "");
+    GeneralCommandLine commandLine = createGeneralCommandLine();
+    logger.info("Running JSTestDriver: " + commandLine.getCommandLineString());
+    return new OSProcessHandler(commandLine.createProcess(), "");
   }
 
   static class ProcessData {
