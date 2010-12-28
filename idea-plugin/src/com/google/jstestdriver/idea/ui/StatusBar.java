@@ -34,28 +34,19 @@ public class StatusBar extends JPanel implements Observer {
   private static final long serialVersionUID = 8729866568493622493L;
 
   public enum Status {
-    NOT_RUNNING {
-      @Override
-      public Color getColor() {
-        return Color.decode("#FF6666");
-      }
-    },
+    NOT_RUNNING("#FF6666"),
+    NO_BROWSERS("#FFFF66"),
+    READY("#66CC66");
 
-    NO_BROWSERS {
-      @Override
-      public Color getColor() {
-        return Color.decode("#FFFF66");
-      }
-    },
+    private final Color color;
 
-    READY {
-      @Override
-      public Color getColor() {
-        return Color.decode("#66CC66");
-      }
-    };
+    Status(String hexColorStr) {
+      color = Color.decode(hexColorStr);
+    }
 
-    public abstract Color getColor();
+    public Color getColor() {
+      return color;
+    }
   }
 
   private JLabel label;
