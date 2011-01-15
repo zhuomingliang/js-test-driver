@@ -19,7 +19,7 @@
  * @fileoverview Defines the AsyncTestRunnerPlugin class, which executes
  * asynchronous test cases within JsTestDriver.
  *
- *      +----------------------------- more tests? ------------ nextTest() <--------------+
+ *     +----------------------------- more tests? ------------ nextTest() <--------------+
  *     |                                                                                 |
  *     v                                                                                 |
  * startSetUp() ---- execute ---> finishSetUp(errors)                                    |
@@ -40,13 +40,18 @@
  *
  * @param dateObj the date object constructor
  * @param clearBody a function to call to clear the document body.
- * @param opt_herdConstructor a constructor for obtaining new CallbackHerds.
+ * @param opt_setTimeout window.setTimeout replacement.
+ * @param opt_queueConstructor a constructor for obtaining new DeferredQueues.
+ * @param opt_armorConstructor a constructor for obtaining new DeferredQueueArmors.
  */
-jstestdriver.plugins.async.AsyncTestRunnerPlugin = function(dateObj, clearBody, opt_herdConstructor) {
+jstestdriver.plugins.async.AsyncTestRunnerPlugin = function(
+    dateObj, clearBody, opt_setTimeout, opt_queueConstructor, opt_armorConstructor) {
   this.name = "AsyncTestRunnerPlugin";
   this.dateObj_ = dateObj;
   this.clearBody_ = clearBody;
-  this.herdConstructor_ = opt_herdConstructor || jstestdriver.plugins.async.CallbackHerd;
+  this.setTimeout_ = opt_setTimeout || jstestdriver.setTimeout;
+  this.queueConstructor_ = opt_queueConstructor || jstestdriver.plugins.async.DeferredQueue;
+  this.armorConstructor_ = opt_armorConstructor || jstestdriver.plugins.async.DeferredQueueArmor;
   this.testRunConfiguration_ = null;
   this.testCaseInfo_ = null;
   this.onTestDone_ = null;
@@ -68,7 +73,6 @@ jstestdriver.plugins.async.AsyncTestRunnerPlugin = function(dateObj, clearBody, 
  */
 jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.runTestConfiguration = function(
     testRunConfiguration, onTestDone, onTestRunConfigurationComplete) {
-    console.log('runTestConfiguration');
   if (testRunConfiguration.getTestCaseInfo().getType() == jstestdriver.TestCaseInfo.ASYNC_TYPE) {
     this.testRunConfiguration_ = testRunConfiguration;
     this.testCaseInfo_ = testRunConfiguration.getTestCaseInfo();
@@ -86,13 +90,13 @@ jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.runTestConfiguration 
  * Runs the next test in the current test case.
  */
 jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.nextTest = function() {
-  console.log('nextTest');
   this.start_ = new this.dateObj_().getTime();
   if (this.testIndex_ < this.testRunConfiguration_.getTests().length) {
+    jstestdriver.expectedAssertCount = -1;
+    jstestdriver.assertCount = 0;
     this.testCase_ = new (this.testCaseInfo_.getTemplate());
     this.testName_ = this.testRunConfiguration_.getTests()[this.testIndex_];
     this.errors_ = [];
-    console.log('next test: ' + this.testName_);
     this.startSetUp();
   } else {
     this.testRunConfiguration_ = null;
@@ -103,41 +107,30 @@ jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.nextTest = function()
     this.testName_ = null;
     this.start_ = null;
     this.errors_ = null;
-    this.onTestRunConfigurationComplete_();
+
+    // Unset this callback before running it because the next callback may be
+    // set by the code run by the callback.
+    var onTestRunConfigurationComplete = this.onTestRunConfigurationComplete_;
     this.onTestRunConfigurationComplete_ = null;
+    onTestRunConfigurationComplete.call(this);
   }
 };
 
 
 /**
  * Starts the next phase of the current test in the current test case. Creates a
- * herd to manage the callbacks spawned during this phase, executes the phase
- * catching any exceptions, and then hands the control over to the herd to
- * call onHerdComplete when it empties.
+ * DeferredQueue to manage the steps of this phase, executes the phase
+ * catching any exceptions, and then hands the control over to the queue to
+ * call onQueueComplete when it empties.
  */
-jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.start = function(
-    onHerdComplete, invokeMethod) {
-  console.log('start');
-
-  // Create a new herd of callbacks that will call invokeMethod() once all callbacks complete.
-  var herd = new (this.herdConstructor_)(jstestdriver.setTimeout, this.testCase_, onHerdComplete);
-
-  // Attempt to invoke the method. The method will add zero or more asynchronous callbacks
-  // to the herd. If the method throws an error, add that error to the list.
-  if (invokeMethod) {
-    try {
-      invokeMethod(herd);
-    } catch (e) {
-      this.errors_.push(e);
-    }
-  }
-
-  // If invokeMethod() schedules any asynchronous callbacks, maybeComplete() does nothing. The herd will
-  // call onHerdComplete() once all the scheduled callbacks complete or expire.
-  //
-  // If invokeMethod() schedules no asynchronous callbacks, maybeComplete() schedules an immediate
-  // call to onHerdComplete().
-  herd.maybeComplete();
+jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.execute_ = function(
+    onStageComplete, invokeMethod) {
+  var runner = this;
+  var onError = function(error) {runner.errors_.push(error);};
+  var stage = new jstestdriver.plugins.async.TestStage(
+      onError, onStageComplete, this.testCase_, invokeMethod, null,
+      this.armorConstructor_, this.queueConstructor_, this.setTimeout_);
+  stage.execute();
 };
 
 
@@ -145,9 +138,8 @@ jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.start = function(
  * Starts the setUp phase.
  */
 jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.startSetUp = function() {
-  console.log('startSetUp');
   var runner = this;
-  this.start(function(errors) {
+  this.execute_(function(errors) {
     runner.finishSetUp(errors);
   }, this.testCase_.setUp);
 };
@@ -159,7 +151,6 @@ jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.startSetUp = function
  * @param errors errors caught during the current asynchronous phase.
  */
 jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.finishSetUp = function(errors) {
-  console.log('finishSetUp');
   this.errors_ = this.errors_.concat(errors);
   if (this.errors_.length) {
     this.startTearDown();
@@ -172,9 +163,8 @@ jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.finishSetUp = functio
  * Starts the testMethod phase.
  */
 jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.startTestMethod = function() {
-  console.log('startTestMethod');
   var runner = this;
-  this.start(function(errors) {
+  this.execute_(function(errors) {
     runner.finishTestMethod(errors);
   }, this.testCase_[this.testName_]);
 };
@@ -186,7 +176,6 @@ jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.startTestMethod = fun
  * @param errors errors caught during the current asynchronous phase.
  */
 jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.finishTestMethod = function(errors) {
-  console.log('finishTestMethod');
   this.errors_ = this.errors_.concat(errors);
   this.startTearDown();
 };
@@ -196,9 +185,8 @@ jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.finishTestMethod = fu
  * Start the tearDown phase.
  */
 jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.startTearDown = function() {
-  console.log('startTearDown');
   var runner = this;
-  this.start(function(errors){
+  this.execute_(function(errors){
     runner.finishTearDown(errors);
   }, this.testCase_.tearDown);
 };
@@ -211,7 +199,6 @@ jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.startTearDown = funct
  * @param errors errors caught during the current asynchronous phase.
  */
 jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.finishTearDown = function(errors) {
-  console.log('finishTearDown');
   this.errors_ = this.errors_.concat(errors);
   this.clearBody_();
   this.onTestDone_(this.buildResult());
@@ -223,16 +210,28 @@ jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.finishTearDown = func
  * Builds a test result.
  */
 jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.buildResult = function() {
-  console.log('buildResult');
   var end = new this.dateObj_().getTime();
   var result = 'passed';
   var message = '';
   if (this.errors_.length) {
     result = 'failed';
-    message = JSON.stringify(this.errors_);
+    var stringifiedErrors = [];
+    for (var i = 0; i < this.errors_.length; ++i) {
+      stringifiedErrors.push(
+          jstestdriver.plugins.TestRunnerPlugin.prototype.serializeError.call(
+              this, this.errors_[i]));
+    }
+    message = stringifiedErrors.join('\n');
+  } else if (jstestdriver.expectedAssertCount != -1 &&
+             jstestdriver.expectedAssertCount != jstestdriver.assertCount) {
+    result = 'failed';
+    message = JSON.stringify(new Error("Expected '" +
+        jstestdriver.expectedAssertCount +
+        "' asserts but '" +
+        jstestdriver.assertCount +
+        "' encountered."));
   }
   return new jstestdriver.TestResult(
       this.testCaseInfo_.getTestCaseName(), this.testName_, result, message,
       jstestdriver.console.getLog(), end - this.start_);
-}
-
+};

@@ -161,7 +161,11 @@
                  FiniteUseCallback.js,
                  Timeout.js,
                  TestSafeCallbackBuilder.js,
-                 CallbackHerd.js" />
+                 CallbackPool.js,
+                 CallbackPoolArmor.js,
+                 DeferredQueue.js,
+                 DeferredQueueArmor.js,
+                 TestStage.js" />
         <filelist dir="${obj.dir}/${javascript-resources}/plugins"
           files="ScriptLoader.js,
                  StylesheetLoader.js,

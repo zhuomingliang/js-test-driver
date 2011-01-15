@@ -99,3 +99,19 @@ jstestdriver.plugins.TestRunnerPlugin.prototype.runTest = function(testCaseName,
             jstestdriver.console.getLog(), 0);
   }
 };
+
+
+/**
+ *@param {Error} e
+ */
+jstestdriver.plugins.TestRunnerPlugin.prototype.serializeError = function(e) {
+  return JSON.stringify({
+    'message' : String(e.message),
+    'name' : String(e.name),
+    'fileName' : String(e.fileName),
+    'lineNumber' : Number(e.lineNumber),
+    'number' : Number(e.number),
+    'description' : String(e.description),
+    'stack' : String(e.stack)
+  });
+};
