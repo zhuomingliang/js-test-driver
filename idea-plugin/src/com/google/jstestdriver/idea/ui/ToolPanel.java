@@ -17,17 +17,21 @@ package com.google.jstestdriver.idea.ui;
 
 import com.google.jstestdriver.*;
 import com.google.jstestdriver.browser.BrowserIdStrategy;
+import com.google.jstestdriver.hooks.FileLoadPostProcessor;
+import com.google.jstestdriver.html.HtmlDocLexer;
+import com.google.jstestdriver.html.HtmlDocParser;
+import com.google.jstestdriver.html.InlineHtmlProcessor;
 import com.google.jstestdriver.idea.MessageBundle;
 import com.google.jstestdriver.idea.PluginResources;
+import com.google.jstestdriver.model.NullPathPrefix;
+import com.google.jstestdriver.util.NullStopWatch;
 import com.intellij.util.ui.UIUtil;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Observable;
-import java.util.Observer;
+import java.io.File;
+import java.util.*;
 
 import static java.text.MessageFormat.format;
 
@@ -100,7 +104,12 @@ public class ToolPanel extends JPanel implements Observer {
       browsers.addObserver(capturedBrowsersPanel);
       browsers.addObserver(statusBar);
       serverStartupAction =
-          new ServerStartupAction(serverPort, browsers, cache, new DefaultURLTranslator(), new DefaultURLRewriter());
+          new ServerStartupAction(serverPort, browsers, cache, SlaveBrowser.TIMEOUT, false, new ProcessingFileLoader(
+              new SimpleFileReader(),
+              Collections.<FileLoadPostProcessor>singleton(new InlineHtmlProcessor(new HtmlDocParser(), new HtmlDocLexer())),
+              new File("."),
+              new NullStopWatch()
+          ), new NullPathPrefix());
       serverStartupAction.addObservers(Arrays.<Observer>asList(statusBar, ToolPanel.this));
       serverStartupAction.run(null);
       final String serverUrl = format("http://{0}:{1,number,###}/capture", InfoPanel.getHostName(), serverPort);

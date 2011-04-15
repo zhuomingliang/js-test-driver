@@ -15,11 +15,26 @@
  */
 package com.google.jstestdriver.idea;
 
+import java.io.File;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
 import com.google.inject.Module;
 import com.google.jstestdriver.JsTestDriverServer;
+import com.google.jstestdriver.idea.javascript.navigation.NavigationRegistry;
+import com.google.jstestdriver.idea.javascript.navigation.NavigationRegistryBuilder;
 import com.google.jstestdriver.idea.ui.ToolPanel;
 import com.intellij.execution.DefaultExecutionResult;
 import com.intellij.execution.ExecutionException;
@@ -37,12 +52,7 @@ import com.intellij.execution.testframework.sm.runner.ui.SMTRunnerConsoleView;
 import com.intellij.execution.testframework.ui.BaseTestsOutputConsoleView;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.io.File;
-import java.util.Set;
-import java.util.concurrent.*;
+import com.intellij.util.concurrency.FutureResult;
 
 import static com.google.common.collect.Lists.transform;
 import static com.intellij.execution.testframework.sm.SMTestRunnerConnectionUtil.attachRunner;
@@ -60,21 +70,28 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
  */
 public class TestRunnerState extends CommandLineState {
 
-  private final JSTestDriverConfiguration jsTestDriverConfiguration;
-  protected final Project project;
-  private final ExecutorService attachExecutor = newSingleThreadExecutor(namedThreadFactory("testProcessLauncher"));
-  private final ExecutorService testResultReceiverExecutor =
+  private static final ExecutorService testResultReceiverExecutor =
       newSingleThreadExecutor(namedThreadFactory("remoteTestResultReceiver-%d"));
+  private static final Logger logger = Logger.getInstance(TestRunnerState.class.getCanonicalName());
 
-  private final Logger logger = Logger.getInstance(TestRunnerState.class.getCanonicalName());
   // TODO(alexeagle): needs to be configurable?
   private static final int testResultPort = 10998;
+  private final JSTestDriverConfiguration jsTestDriverConfiguration;
+  protected final Project project;
 
-  private ThreadFactory namedThreadFactory(final String threadName) {
+  private static ThreadFactory namedThreadFactory(final String threadName) {
     return new ThreadFactory() {
+      final AtomicInteger cnt = new AtomicInteger(0);
       @Override public Thread newThread(Runnable r) {
+        int num = cnt.incrementAndGet();
         Thread thread = Executors.defaultThreadFactory().newThread(r);
-        thread.setName(threadName);
+        thread.setName(String.format(threadName, num));
+        thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+          @Override
+          public void uncaughtException(Thread t, Throwable e) {
+            logger.error("Uncaught exception on " + t, e);
+          }
+        });
         return thread;
       }};
   }
@@ -138,23 +155,38 @@ public class TestRunnerState extends CommandLineState {
   public ExecutionResult execute(@NotNull Executor executor, @NotNull ProgramRunner runner) throws ExecutionException {
     final TestConsoleProperties testConsoleProperties =
         new SMTRunnerConsoleProperties(jsTestDriverConfiguration, "jsTestDriver", executor);
-    final CountDownLatch receivingSocketOpen = new CountDownLatch(1);
-    Future<ProcessData> data = attachExecutor.submit(new Callable<ProcessData>() {
-      public ProcessData call() throws Exception {
-        // Let the receiver start before we write anything to it.
-        receivingSocketOpen.await();
-        ProcessHandler processHandler = startProcess();
-        BaseTestsOutputConsoleView consoleView =
-            attachRunner(project.getName(), processHandler, testConsoleProperties, getRunnerSettings(), getConfigurationSettings());
-        return new ProcessData((SMTRunnerConsoleView) consoleView, processHandler);
-      }
-    });
-    TestListenerContext context = new TestListenerContext(data);
-    final RemoteTestListener listener = new RemoteTestListener(context);
-    testResultReceiverExecutor.submit(
+
+    FutureResult<ProcessData> processDataFuture = new FutureResult<ProcessData>();
+    TestListenerContext context = new TestListenerContext(processDataFuture);
+    RemoteTestListener listener = createRemoteTestListener(context);
+
+    CountDownLatch receivingSocketOpen = new CountDownLatch(1);
+    Future<?> testResultReceiverFuture = testResultReceiverExecutor.submit(
         new RemoteTestResultReceiver(listener, testResultPort, receivingSocketOpen));
+    // TODO (ssimonchik) try get test results from process output stream without sockets
+    try {
+      receivingSocketOpen.await(5, TimeUnit.SECONDS);
+    } catch (InterruptedException e) {
+      throw new ExecutionException("Thread has been interrupted unexpectedly", e);
+    }
+    if (testResultReceiverFuture.isDone()) {
+      throw new ExecutionException("RemoteTestResultReceiver exits unexpectedly. See log for details");
+    }
+
+    ProcessHandler processHandler = startProcess();
+    BaseTestsOutputConsoleView consoleView =
+        attachRunner(project.getName(), processHandler, testConsoleProperties, getRunnerSettings(), getConfigurationSettings());
+    processDataFuture.set(new ProcessData((SMTRunnerConsoleView) consoleView, processHandler));
+
     return new DefaultExecutionResult(context.consoleView(), context.processHandler(),
         createActions(context.consoleView(), context.processHandler()));
+  }
+
+  private RemoteTestListener createRemoteTestListener(TestListenerContext context) {
+    File configFile = new File(jsTestDriverConfiguration.getSettingsFile());
+    NavigationRegistryBuilder builder = NavigationRegistryBuilder.getInstance();
+    NavigationRegistry registry = builder.buildNavigationRegistry(project, configFile, configFile.getParentFile());
+    return new RemoteTestListener(registry, context);
   }
 
   @Override

@@ -15,13 +15,18 @@
  */
 package com.google.jstestdriver.idea;
 
-import com.google.jstestdriver.idea.ui.BrowserNode;
-import com.google.jstestdriver.idea.ui.TestCaseNode;
-import com.intellij.execution.testframework.sm.runner.SMTestProxy;
-import com.intellij.openapi.util.Key;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import com.google.jstestdriver.idea.javascript.navigation.NavigationRegistry;
+import com.google.jstestdriver.idea.javascript.navigation.Test;
+import com.google.jstestdriver.idea.javascript.navigation.TestCase;
+import com.google.jstestdriver.idea.ui.BrowserNode;
+import com.google.jstestdriver.idea.ui.TestCaseNode;
+import com.intellij.execution.Location;
+import com.intellij.execution.testframework.sm.runner.SMTestProxy;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Key;
 
 import static com.google.jstestdriver.TestResult.Result;
 
@@ -33,9 +38,11 @@ import static com.google.jstestdriver.TestResult.Result;
 public class RemoteTestListener {
   private final TestListenerContext context;
   private final Map<String, BrowserNode> browserMap = new HashMap<String, BrowserNode>();
+  private final NavigationRegistry myNavigationContext;
 
-  public RemoteTestListener(TestListenerContext ctx) {
+  public RemoteTestListener(NavigationRegistry navigationRegistry, TestListenerContext ctx) {
     this.context = ctx;
+    this.myNavigationContext = navigationRegistry;
   }
 
   // This method must only be called on the AWT event thread, as it updates the UI.
@@ -47,14 +54,26 @@ public class RemoteTestListener {
     }
     BrowserNode browser = browserMap.get(message.browser);
 
+    final TestCase testCaseLocation = myNavigationContext.getTestCaseByName(message.testCase);
     if (!browser.testCaseMap.containsKey(message.testCase)) {
-      SMTestProxy testCaseNode = new SMTestProxy(message.testCase, true, null);
+      SMTestProxy testCaseNode = new SMTestProxy(message.testCase, true, null) {
+        @Override
+        public Location getLocation(Project project) {
+          return testCaseLocation == null ? null : testCaseLocation.getLocation();
+        }
+      };
       browser.testCaseMap.put(message.testCase, new TestCaseNode(testCaseNode));
       onSuiteStarted(browser.node, testCaseNode);
     }
     TestCaseNode testCase = browser.testCaseMap.get(message.testCase);
 
-    SMTestProxy testNode = new SMTestProxy(message.testName, false, null);
+    final Test testLocation = testCaseLocation != null ? testCaseLocation.getTestByName(message.testName) : null;
+    SMTestProxy testNode = new SMTestProxy(message.testName, false, null) {
+      @Override
+      public Location getLocation(Project project) {
+        return testLocation != null ? testLocation.getLocation() : null;
+      }
+    };
     testCase.testProxyMap.put(message.testName, testNode);
     testCase.node.addChild(testNode);
     context.resultsForm().onTestStarted(testNode);
@@ -81,6 +100,7 @@ public class RemoteTestListener {
     if (testCaseNode.allTestsComplete()) {
       onSuiteFinished(testCaseNode.node);
     }
+
     if (browserNode.allTestCasesComplete()) {
       onSuiteFinished(browserNode.node);
     }

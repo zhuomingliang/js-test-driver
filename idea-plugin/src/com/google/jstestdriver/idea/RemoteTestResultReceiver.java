@@ -1,12 +1,12 @@
 package com.google.jstestdriver.idea;
 
-import javax.swing.*;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.CountDownLatch;
+import javax.swing.SwingUtilities;
 
 /**
  * The IDE end of the socket communication from the TestRunner. Should be run in a background thread. When data is
@@ -33,31 +33,42 @@ public class RemoteTestResultReceiver implements Runnable {
    */
   @Override public void run() {
     Socket client = null;
-    ObjectInputStream in = null;
+    Exception savedException = null;
     try {
       socket = new ServerSocket(port);
       serverStarted.countDown();
       client = socket.accept();
-      in = new ObjectInputStream(client.getInputStream());
+      ObjectInputStream in = new ObjectInputStream(client.getInputStream());
       readTestResults(in);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    } catch (Exception e) {
+      savedException = e;
     } finally {
-      try {
-        if (socket != null) {
-          socket.close();
-        }
-        if (client != null) {
+      if (client != null) {
+        try {
+          // also closes socket input stream
           client.close();
+        } catch (Exception e) {
+          if (savedException != null) {
+            savedException = e;
+          }
         }
-        if (in != null) {
-          in.close();
+      }
+      if (socket != null) {
+        try {
+          socket.close();
+        } catch (Exception e) {
+          if (savedException != null) {
+            savedException = e;
+          }
         }
-      } catch (IOException e) {
-        // oh well
       }
     }
+    if (savedException != null) {
+      savedException.printStackTrace();
+      throw new RuntimeException(savedException);
+    }
   }
+
 
   private void readTestResults(ObjectInputStream in) throws IOException {
     while (true) {
