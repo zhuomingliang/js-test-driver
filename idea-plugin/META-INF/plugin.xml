@@ -20,7 +20,7 @@
   <version>1.3</version>
   <vendor url="http://code.google.com/p/js-test-driver/"
           email="js-test-driver@googlegroups.com">Google</vendor>
-  <idea-version since-build="9886"/>
+  <idea-version since-build="9918" until-build="107.0"/>
   <depends>com.intellij.modules.lang</depends>
   <depends optional="true" config-file="yaml-support.xml">org.jetbrains.plugins.yaml</depends>
   <depends optional="true" config-file="javascript-support.xml">JavaScript</depends>
@@ -34,6 +34,22 @@
   </project-components>
   <change-notes>
     <![CDATA[
+Version 1.3:
+
+Build on JsTestDriver 1.3.2.
+
+Bug fixes:
+ - Compatibility problems preventing test run are solved.
+
+New features:
+ - Navigation from test result tree to source code is available with double click or F4, 'Javascript support' plugin required.
+ - JsTestDriver assert framework and QUnit Adapter are supported, 'Javascript support' plugin required.
+ - JsTestDriver config file structure is partially supported, 'YAML' plugin required:
+   - Path completion added (no globbing support).
+   - It's possible to go to the file declaration with help of Ctrl+click or Ctrl+B shortcut.
+   - File is classified as JsTestDriver config file if it has '*.jstd' file extension or
+     referred by any JsTestDriver Run Configuration (in the latter case config file can have any extension).
+
 Version 1.2:
 - Enable plugins when running tests, such as the coverage plugin
 - Bug fix: when browser disconnects, icon goes grey. When all browsers
