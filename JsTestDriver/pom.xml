@@ -303,6 +303,18 @@
 		</testResources>
 		<plugins>
 			<plugin>
+				<groupId>org.sonatype.maven.plugin</groupId>
+				<artifactId>emma-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>instrument</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr3-maven-plugin</artifactId>
 				<executions>
@@ -533,7 +545,26 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore/>
+										<ignore />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.sonatype.maven.plugin
+										</groupId>
+										<artifactId>
+											emma-maven-plugin
+										</artifactId>
+										<versionRange>
+											[1.2,)
+										</versionRange>
+										<goals>
+											<goal>instrument</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -543,7 +574,19 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.sonatype.maven.plugin</groupId>
+				<artifactId>maven-emma-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>surefire-report-maven-plugin</artifactId>
+				<version>2.12</version>
+			</plugin>
+		</plugins>
+	</reporting>
 	<profiles>
 		<profile>
 			<id>metadatanet-deploy</id>
